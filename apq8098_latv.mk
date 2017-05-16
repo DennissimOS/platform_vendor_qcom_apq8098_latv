@@ -221,7 +221,4 @@ PRODUCT_PACKAGES += android.hardware.health@1.0-impl \
 		    android.hardware.health@1.0-service \
 		    libhealthd.msm
 
-#ATV
-PRODUCT_PACKAGES += TvProvider \
-            TvSettings \
-            TvQuickSettings
+$(call inherit-product, device/qcom/apq8098_latv/products/atv_generic.mk)
