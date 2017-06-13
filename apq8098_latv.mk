@@ -1,28 +1,27 @@
 TARGET_USES_AOSP := true
-TARGET_USES_AOSP_FOR_AUDIO := false
 TARGET_USES_QCOM_BSP := false
 
-ifeq ($(TARGET_USES_AOSP),true)
-TARGET_ENABLE_QC_AV_ENHANCEMENTS := false
-TARGET_DISABLE_DASH := true
-else
+ifneq ($(TARGET_USES_AOSP),true)
 DEVICE_PACKAGE_OVERLAYS := device/qcom/apq8098_latv/overlay
-TARGET_ENABLE_QC_AV_ENHANCEMENTS := true
 endif
+
+TARGET_USES_AOSP_FOR_AUDIO := false
+TARGET_ENABLE_QC_AV_ENHANCEMENTS := true
+TARGET_DISABLE_DASH := true
 
 # Default vendor configuration.
 ifeq ($(ENABLE_VENDOR_IMAGE),)
-ENABLE_VENDOR_IMAGE := false
+ENABLE_VENDOR_IMAGE := true
 endif
 
 # Disable QTIC until it's brought up in split system/vendor
 # configuration to avoid compilation breakage.
 ifeq ($(ENABLE_VENDOR_IMAGE), true)
-TARGET_USES_QTIC := false
+#TARGET_USES_QTIC := false
 endif
 
 TARGET_KERNEL_VERSION := 4.4
-BOARD_HAVE_QCOM_FM := false
+BOARD_HAVE_QCOM_FM := true
 TARGET_USES_NQ_NFC := false
 
 ifeq ($(TARGET_USES_NQ_NFC),true)
@@ -37,8 +36,11 @@ TARGET_USE_UI_SVA := true
 
 # Video codec configuration files
 ifeq ($(TARGET_ENABLE_QC_AV_ENHANCEMENTS), true)
-PRODUCT_COPY_FILES += device/qcom/apq8098_latv/media_profiles.xml:system/etc/media_profiles.xml \
-                      device/qcom/apq8098_latv/media_codecs.xml:system/etc/media_codecs.xml
+PRODUCT_COPY_FILES += \
+    device/qcom/apq8098_latv/media_profiles.xml:system/etc/media_profiles.xml \
+    device/qcom/apq8098_latv/media_profiles.xml:$(TARGET_COPY_OUT_VENDOR)/etc/media_profiles.xml \
+    device/qcom/apq8098_latv/media_codecs.xml:$(TARGET_COPY_OUT_VENDOR)/etc/media_codecs.xml \
+    device/qcom/apq8098_latv/media_codecs_performance.xml:$(TARGET_COPY_OUT_VENDOR)/etc/media_codecs_performance.xml
 endif #TARGET_ENABLE_QC_AV_ENHANCEMENTS
 
 ifneq ($(TARGET_DISABLE_DASH), true)
@@ -79,13 +81,13 @@ WLAN_CHIPSET := qca_cld3
 
 #Android EGL implementation
 PRODUCT_PACKAGES += libGLES_android
-#PRODUCT_BOOT_JARS += tcmiface
+PRODUCT_BOOT_JARS += tcmiface
 PRODUCT_BOOT_JARS += telephony-ext
 
 PRODUCT_PACKAGES += telephony-ext
 
 ifneq ($(strip $(QCPATH)),)
-#PRODUCT_BOOT_JARS += WfdCommon
+PRODUCT_BOOT_JARS += WfdCommon
 #Android oem shutdown hook
 PRODUCT_BOOT_JARS += oem-services
 endif
@@ -108,7 +110,7 @@ PRODUCT_PACKAGES += android.hardware.media.omx@1.0-impl
 
 # Sensor HAL conf file
 PRODUCT_COPY_FILES += \
-    device/qcom/apq8098_latv/sensors/hals.conf:system/etc/sensors/hals.conf
+    device/qcom/apq8098_latv/sensors/hals.conf:vendor/etc/sensors/hals.conf
 
 # WLAN host driver
 ifneq ($(WLAN_CHIPSET),)
@@ -144,6 +146,14 @@ PRODUCT_PACKAGES += \
     android.hardware.light@2.0-service \
     android.hardware.configstore@1.0-service
 
+PRODUCT_PACKAGES += \
+    vendor.display.color@1.0-service \
+    vendor.display.color@1.0-impl
+
+# Vibrator
+PRODUCT_PACKAGES += \
+    android.hardware.vibrator@1.0-impl \
+    android.hardware.vibrator@1.0-service \
 
 # Camera configuration file. Shared by passthrough/binderized camera HAL
 PRODUCT_PACKAGES += camera.device@3.2-impl
@@ -172,7 +182,7 @@ PRODUCT_COPY_FILES += \
 
 # FBE support
 PRODUCT_COPY_FILES += \
-    device/qcom/apq8098_latv/init.qcom.qseecomd.sh:system/bin/init.qcom.qseecomd.sh
+    device/qcom/apq8098_latv/init.qti.qseecomd.sh:$(TARGET_COPY_OUT_VENDOR)/bin/init.qti.qseecomd.sh
 
 # MSM IRQ Balancer configuration file
 PRODUCT_COPY_FILES += device/qcom/apq8098_latv/msm_irqbalance.conf:$(TARGET_COPY_OUT_VENDOR)/etc/msm_irqbalance.conf
@@ -220,5 +230,9 @@ PRODUCT_PACKAGES += android.hardware.health@1.0-impl \
 		    android.hardware.health@1.0-convert \
 		    android.hardware.health@1.0-service \
 		    libhealthd.msm
+
+#FEATURE_OPENGLES_EXTENSION_PACK support string config file
+PRODUCT_COPY_FILES += \
+	frameworks/native/data/etc/android.hardware.opengles.aep.xml:system/etc/permissions/android.hardware.opengles.aep.xml
 
 $(call inherit-product, device/qcom/apq8098_latv/products/atv_generic.mk)

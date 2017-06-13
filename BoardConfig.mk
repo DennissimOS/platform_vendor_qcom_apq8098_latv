@@ -21,8 +21,6 @@ TARGET_2ND_CPU_VARIANT := cortex-a53
 ifeq ($(TARGET_USES_AOSP), true)
 TARGET_HW_DISK_ENCRYPTION := false
 else
-# SDClang configuration
-SDCLANG := true
 #Enable HW based full disk encryption
 TARGET_HW_DISK_ENCRYPTION := true
 endif
@@ -76,6 +74,8 @@ TARGET_USES_ION := true
 TARGET_USES_NEW_ION_API :=true
 TARGET_USES_HWC2 := true
 TARGET_USES_GRALLOC1 := true
+TARGET_USES_QCOM_DISPLAY_BSP := true
+TARGET_USES_COLOR_METADATA := true
 
 ifeq ($(BOARD_KERNEL_CMDLINE),)
 ifeq ($(TARGET_KERNEL_VERSION),4.4)
