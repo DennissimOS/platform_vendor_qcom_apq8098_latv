@@ -55,9 +55,6 @@ PRODUCT_PACKAGES += \
     android.hardware.power@1.0-service \
     android.hardware.power@1.0-impl
 
-# Add support for whitelisted apps
-PRODUCT_COPY_FILES += device/qcom/apq8098_latv/whitelistedapps.xml:system/etc/whitelistedapps.xml
-
 #QTIC flag
 -include $(QCPATH)/common/config/qtic-config.mk
 
